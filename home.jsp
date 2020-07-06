@@ -19,7 +19,19 @@
 		<li class="list-group-item"><a href="/add">Add Employee</a></li>
 		<li class="list-group-item"><a href="/filter">Filter Employee</a></li>
 		<li class="list-group-item"><a href="/sort">Sort Employee</a></li>
+		<li class="list-group-item"><a href="/query">Query Property expressions</a></li>
 	</ul>	
 </div> 
+
+<div class="container">
+	<h4>Address Details</h4>
+	<ul class="list-group" style="width:300px">
+		<li class="list-group-item"><a href="/Address/addUpdateAddr">Add Address</a></li>
+		<!-- <li class="list-group-item"><a href="/Address/deleteAddr">Delete Address</a></li> -->
+		<li class="list-group-item"><a href="/Address/viewAddr">View Address</a></li>
+	</ul>
+</div>
+
+
 </body>
 </html>
