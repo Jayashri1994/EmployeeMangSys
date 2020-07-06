@@ -1,6 +1,7 @@
 package com.emp.appli.web.Controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,18 +34,22 @@ public class EmployeeController {
 	@GetMapping("/list")
 	public String listAllEmployee(ModelMap model) {	
 		if(model.containsKey("filterList")) {
-			return "listEmp";
+			return "Emp_List";
 		}	
 		if(model.containsKey("sortList")) {
-			return "listEmp";
+			return "Emp_List";
 		}
+		if(model.containsKey("queryList")) {
+			return "Emp_List";
+		}
+
 		model.put("Emplist", empRepo.findAll());
-		return "listEmp";
+		return "Emp_List";
 	}
 	
 	/*@GetMapping("/add")
 	public String showAddEmployeePage() {
-		return "addUpdateEmp";
+		return "Emp_AddUpdate";
 	}*/
 	
 	//after
@@ -52,13 +57,13 @@ public class EmployeeController {
 	@GetMapping("/add")
 	public String showAddEmployeePage(ModelMap model) {
 		model.addAttribute("emp", new Employee()); //Bean to View 
-		return "addUpdateEmp";
+		return "Emp_AddUpdate";
 	}
 	
 	@PostMapping("/add")
 	public String AddEmployee(@ModelAttribute("emp")  @Valid Employee emp, BindingResult results) { // View to Bean
-		if(results.hasErrors()) {
-			return "addUpdateEmp";
+		if(results.hasErrors()) {			// View to Bean @ModelAttribute("emp")
+			return "Emp_AddUpdate";
 		}
 		empRepo.save(emp);
 		return "redirect:/list";
@@ -79,22 +84,22 @@ public class EmployeeController {
 	
 	@GetMapping("/update")
 	public String showUpdateTodoPage(@RequestParam int id, ModelMap model) {		
-		model.addAttribute("emp",empRepo.findById(id));		
-		return "addUpdateEmp";
+		model.addAttribute("emp",empRepo.findById(id));		// Bean to View
+		return "Emp_AddUpdate";
 	}
 
 	@PostMapping("/update")
-	public String updateEmployee(@Valid Employee emp, BindingResult results,ModelMap model) {
+	public String updateEmployee(@Valid Employee emp, BindingResult results) {
 		
 		if(results.hasErrors()) {
-			return "addUpdateEmp";
+			return "Emp_AddUpdate";
 		}	
 		empRepo.save(emp);
 		return "redirect:/list";
 	}
 
    @ModelAttribute("cityList")
-   public Map<String, String> getCityList() {
+   public Map<String, String> getCityList() {	   
       Map<String, String> cityList = new HashMap<String, String>();
       cityList.put("CHENNAI", "CHENNAI");
       cityList.put("MUMBAI", "MUMBAI");
@@ -107,14 +112,14 @@ public class EmployeeController {
 	@GetMapping("/filter")
 	public String showFilterEmployeePage(ModelMap model) {
 		model.addAttribute("emp" ,new Employee());
-		return "filterEmp";
+		return "Emp_Filter";
 	}
 	
 	
 	@PostMapping("/filter")
 	public String FilterEmployee(String filter,@Valid @ModelAttribute("emp")  Employee emp,BindingResult results, ModelMap model,RedirectAttributes redirectAttributes){
 		if(results.hasErrors()) {
-			return "filterEmp";
+			return "Emp_Filter";
 		}		
 		redirectAttributes.addFlashAttribute("filterList",empServ.filterEmp(filter,emp.getAge() ,emp.getCity(),  emp.getSalary()));
 		return "redirect:/list";
@@ -122,7 +127,7 @@ public class EmployeeController {
 	
 	@GetMapping("/sort")
 	public String showSortEmployee() {
-		return "sortEmp"; 
+		return "Emp_Sort"; 
 	}
 		
 	@PostMapping("/sort")
@@ -131,4 +136,24 @@ public class EmployeeController {
 		return "redirect:/list"; 
 	}
 	
+	
+	@GetMapping("/query")
+	public String showQueryPage() {
+		return "Emp_Query";
+	}
+	
+	@PostMapping("/query")
+	public String queryEmployee(String queryType, String name, String city, Integer age, String pattern,
+			Integer startAge, Integer endAge, /* List<Integer> ageList, */ RedirectAttributes redirectAttributes, Integer salary, ModelMap model ) {
+
+		if(queryType.equals("Count") || queryType.equals("Min") || queryType.equals("Max") || queryType.equals("Avg") ||  queryType.equals("EmpSal") ) {
+			model.put("results",empServ.rawQueryEmp(queryType, name, salary));
+			return "Emp_Query_Results";
+			
+		}
+		
+		redirectAttributes.addFlashAttribute("queryList",empServ.queryEmp(queryType, name, city, age, pattern, startAge, endAge,salary/* ,ageList */));
+		
+		return "redirect:/list";
+	}
 }

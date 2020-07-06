@@ -1,8 +1,8 @@
 package com.emp.appli.web.Rest;
 
 import java.util.List;
-
 import javax.validation.Valid;
+import javax.ws.rs.QueryParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.emp.appli.web.Bean.Employee;
@@ -96,11 +97,9 @@ public class EmployeeRestController {
 	// <------------------------ Update by ID------------------------>
 	
 	@PutMapping("/updateEmp/{id}")
-	public List<Employee> updateEmp(@PathVariable int id, @RequestBody @Valid Employee emp) {
-		System.out.println("HEYYYYYYYYY "+id);
-		System.out.println("val"+emp.getCity());
+	public List<Employee> updateEmp(@PathVariable int id, @RequestBody @Valid Employee emp) {		
 		Employee empExist = empRepo.findById(id).orElse(new Employee());
-		empExist.setAge(emp.getAge());
+		empExist.setAge(emp.getAge());  // no need of setting it separately
 		empExist.setCity(emp.getCity());
 		empExist.setName(emp.getName());
 		empExist.setSalary(emp.getSalary());
@@ -143,4 +142,26 @@ public class EmployeeRestController {
 		empRepo.deleteAll();
 		return empRepo.findAll();
 	}
+	
+	
+	// use only for MVC
+	@GetMapping("/listEmployeeRequestParam")
+	public List<Employee> listEmployeeRequestParam(@RequestParam("name") String name, @RequestParam("city") String city) {
+		return empRepo.findByNameOrCity(name, city);
+	}
+	
+	// Use it only for REST
+	@GetMapping("/listEmployeeQueryParam")
+	public List<Employee> listEmployeeQueryParam(@QueryParam("name") String name, @QueryParam("city") String city) {
+		return empRepo.findByNameOrCity(name, city);
+	}
+	
+	@GetMapping("/listEmployeePathVariable/{name}/{city}")
+	public List<Employee> listEmployeePathVariable(@PathVariable("name") String name, @PathVariable("city") String city) {
+		return empRepo.findByNameOrCity(name, city);
+	}
+	
+	
+	
+	
 }
